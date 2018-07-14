@@ -6,16 +6,16 @@
 //考虑以下几个问题:
 //1.如何存放信号槽函数
 //2.发送信号时,如何判断信号槽函数"所属"对象是否已经不存在?
-//3.静态模板成员函数,什么时候实例化?
+//3.如何利用模板实例化不同的"emiter()"?
 //问题1的回答:统一用字节存放
-//问题2的回答:使用继承,利用"确定性析构"特性
-//问题3的回答:暂时不知
+//问题2的回答:继承
 
 
 //XXX:不能对整个类模板化,不然在signal
 //构造的时候,会出现先有鸡还是先有蛋的问题
 class Slots;
-//FIXME:这个类是关键
+
+//FIXME:这个类是关键:w
 class Connected{
     typedef void(Connected::*sm_t)(Connected*);
     template <typename From,typename To>
@@ -43,8 +43,8 @@ public:
     template<typename...ArgTypes>
     void operator()(ArgTypes...args)
     {
-        //FIXME:如果不是静态成员函数,编译器
-        //无法推导出对应的emiter()
+        //可以直接这样么?
+        //编译器可以找到那个emiter么?
         //emiter(this,args...);
         typedef void(*emit_t)(Connected*,ArgTypes...);
         Caster<sm_t,emit_t> caster;
@@ -57,7 +57,6 @@ public:
     }
     
 private:
-    //FIXME:静态成员函数模板,什么时候实例化?
     template <typename Dest,typename...ArgTypes>
     static void emiter(Connected* self,ArgTypes...args)
     {

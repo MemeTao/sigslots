@@ -1,22 +1,32 @@
+#include "../sigslots.h"
 #include <iostream>
-class A{
+class Send{
 public:
-    void foo(){}
+    Send()
+    {
+        ;
+    }
+    Signal<int,double> signal_;
 };
 
-void bar(void* p)
-{
-    std::cout<<"size of p:"<<sizeof(p)<<std::endl;
-}
+class Recive : public Slots{
+public:
+    Recive()
+    {}
+    void rec(int i,double d)
+    {
+        (void) i;
+        (void) d;
+        std::cout<<"i:"<<i<<",d:"<<d<<std::endl;
+    }
+};
 
 int main()
 {
-    A a;
-    void* p = nullptr;
-    std::cout<<"size of p:"<<sizeof(p)<<std::endl;
-    std::cout<<"size of mem:"<<sizeof(&A::foo)<<std::endl;
-    auto pfun = &A::foo;
-    std::cout<<"size of pfun:"<<sizeof(pfun)<<std::endl;
-    bar(&pfun);
+    Send src;
+    Recive handle;
+    src.signal_.connect<Recive>(&handle,&Recive::rec);
+    src.signal_(2,3);
+
     return 0;
 }
